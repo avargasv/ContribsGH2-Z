@@ -21,7 +21,7 @@ In a similar way, the pseudo-contributor “Other contributors” must be used t
 the value of the “min-contribs” parameter (within each repository or within the entire organization, depending 
 on the value of the “group-level” parameter).*
 
-The structure of the problem asked for a solution consisting of three modules: a REST server to implement the 
+The structure of the problem asked for a solution composed of three modules: a REST server to implement the 
 endpoint of the service, a REST client to get the necessary data from GitHub, and a processing module to make calls 
 to the REST client and transform the data retrieved from GitHub to the format required by the REST server.
 
@@ -755,7 +755,7 @@ interrupted and cancelled explicitly, giving to a programmer looking for a low l
 of practically unlimited power. Concurrency using fibers performs much better than directly using JVM threads, 
 since they are implemented in a way that allows a single JVM thread to execute many fibers. ZIO also provides 
 tools for concurrency and parallelism at a higher level, which make the explicit use of fibers unnecessary in 
-the majority of cases. 
+most cases. 
 
 - **Higher level tools for concurrency.** ZIO provides synchronization primitives and concurrent data structures 
 that greatly simplify the development of concurrent applications, such as:
@@ -804,14 +804,15 @@ Those refactorings resulted in a better modular structure as explained in detail
 
 Based on all of our discussion above, we could conclude that **our ZIO solution to the software development problem 
 stated in Section 1 has the conceptual advantages derived from the use of pure functional effects, as well as the 
-practical benefits derived from the advanced concurrency/parallelism technology used by ZIO**. However, there should 
-be more to do with ZIO and ZIO-Http to better solve this problem. After all, our ZIO solution is the result of the 
-migration from a previous non-ZIO solution. Could it be further transformed into a more ZIO idiomatic solution? Could 
-that effort be a good test of the maintainability of a ZIO-Http program? Could we take advantage of the recently 
-announced [refactoring of ZIO-Http](https://www.youtube.com/watch?v=ozHQmklDF2Y) to get an even better ZIO solution? 
-We hope to give a categorical positive answer to all these questions in a future post, but perhaps it would be better 
-first to write a little more about the conceptual and practical advantages of a clear separation between the definition 
-of an effectful program and the execution of its effects.
+practical benefits derived from the advanced concurrency/parallelism technology used by ZIO**. 
+
+However, there should be more to do with ZIO and ZIO-Http to better solve this problem. After all, our ZIO solution 
+is the result of the migration from a previous non-ZIO solution. Could it be further transformed into a more ZIO 
+idiomatic solution? Could that effort be a good test of the maintainability of a ZIO-Http program? Could we take 
+advantage of the recently announced [refactoring of ZIO-Http](https://www.youtube.com/watch?v=ozHQmklDF2Y) to get 
+an even better ZIO solution? We hope to give a categorical positive answer to all these questions in a future post, 
+but perhaps it would be better first to write a little more about the conceptual and practical advantages of a clear 
+separation between the definition of an effectful program and the execution of its effects.
 
 Finally, some links to great resources available for learning ZIO:
 - Courses, [Rock The JVM](https://rockthejvm.com/p/zio), [Developer Inside You](https://www.youtube.com/playlist?list=PLJGDHERh23x-_ammk-n2XuZWhoRVB-wAF). 
