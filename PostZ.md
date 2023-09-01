@@ -217,7 +217,8 @@ A few examples may help to clarify the concepts presented so far:
     } yield ()
 
   // appEcho
-  val appEcho = Console.readLine("Echo ... please type something\n").flatMap(line => Console.printLine(line))
+  val appEcho = Console.readLine("Echo ... please type something\n").
+                flatMap(line => Console.printLine(line))
 
   // appHello
   val appHello =
@@ -288,11 +289,14 @@ of our program, allows us to report in a LogBack logger information about the ti
 ```scala
 for {
   initialInstant <- Clock.instant
-  _ <- ZIO.succeed(logger.info(s"Starting ContribsGH2-Z REST API call at ${sdf.format(Date.from(initialInstant))}"))
+  _ <- ZIO.succeed(logger.info
+       (s"Starting ContribsGH2-Z REST API call at ${sdf.format(Date.from(initialInstant))}"))
   _ <- ZIO.succeed(logger.info("Working ..."))
   finalInstant <- Clock.instant
-  _ <- ZIO.succeed(logger.info(s"Finished ContribsGH2-Z REST API call at ${sdf.format(Date.from(finalInstant))}"))
-  _ <- ZIO.succeed(logger.info(f"Time elapsed: ${Duration.between(initialInstant, finalInstant).toMillis / 1000.0}%3.2f seconds"))
+  _ <- ZIO.succeed(logger.info
+       (s"Finished ContribsGH2-Z REST API call at ${sdf.format(Date.from(finalInstant))}"))
+  _ <- ZIO.succeed(logger.info
+       (f"Time elapsed: ${Duration.between(initialInstant, finalInstant).toMillis / 1000.0}%3.2f seconds"))
 } yield ()
 ```
 The configuration and creation of the LogBack logger was kept unaltered in the migration from Akka-Http to ZIO-Http.
@@ -407,9 +411,11 @@ def processResponseBody[T](url: String) (processPage: BodyString => List[T]): Li
 ```
 Which is replaced, in the case ZIO-Http, with the following:
 ```scala
-def processResponseBody[T](url: String) (processPage: BodyString => List[T]): ZIO[zio.http.Client, Nothing, List[T]] = {
+def processResponseBody[T](url: String) (processPage: BodyString => List[T]): 
+  ZIO[zio.http.Client, Nothing, List[T]] = {
 
-  def processResponsePage(processedPages: List[T], pageNumber: Int): ZIO[zio.http.Client, Nothing, List[T]] = {
+  def processResponsePage(processedPages: List[T], pageNumber: Int): 
+    ZIO[zio.http.Client, Nothing, List[T]] = {
     getResponseBody(s"$url?page=$pageNumber&per_page=100").orDie.flatMap {
       case Right(pageBody) if pageBody.length > 2 =>
         val processedPage = processPage(pageBody)
@@ -479,11 +485,12 @@ def contributorsByOrganization(organization: Organization, groupLevel: String, m
 
 def contributorsDetailedZIOWithCache(organization: Organization, repos: List[Repository]):
   ZIO[zio.http.Client, Throwable, List[Contributor]] = {
-  val (reposUpdatedInCache, reposNotUpdatedInCache) = repos.partition(restServerCache.repoUpdatedInCache(organization, _))
+  val (reposUpdatedInCache, reposNotUpdatedInCache) = repos.
+       partition(restServerCache.repoUpdatedInCache(organization, _))
   val contributorsDetailed_L_1: List[List[Contributor]] =
-    reposUpdatedInCache.map { repo =>
-      restServerCache.retrieveContributorsFromCache(organization, repo)
-    }
+      reposUpdatedInCache.map { repo =>
+        restServerCache.retrieveContributorsFromCache(organization, repo)
+      }
   val contributorsDetailed_L_Z_2 =
     reposNotUpdatedInCache.map { repo =>
       restClient.contributorsByRepo(organization, repo)
@@ -494,7 +501,8 @@ def contributorsDetailedZIOWithCache(organization: Organization, repos: List[Rep
   //val contributorsDetailed_Z_L_2 = ZIO.collectAll(contributorsDetailed_L_Z_2)
   for {
     contributorsDetailed_L_2 <- contributorsDetailed_Z_L_2
-    _ <- ZIO.succeed(restServerCache.updateCache(organization, reposNotUpdatedInCache, contributorsDetailed_L_2))
+    _ <- ZIO.succeed(restServerCache.
+         updateCache(organization, reposNotUpdatedInCache, contributorsDetailed_L_2))
   } yield (contributorsDetailed_L_1 ++ contributorsDetailed_L_2).flatten
 }
 ```
@@ -592,14 +600,15 @@ new layer:
 trait RestServerCache {
   def repoUpdatedInCache(org:Organization, repo: Repository): Boolean
   def retrieveContributorsFromCache(org:Organization, repo: Repository): List[Contributor]
-  def updateCache(organization: Organization, reposNotUpdatedInCache: List[Repository], contributors_L: List[List[Contributor]]): Unit
+  def updateCache(organization: Organization, reposNotUpdatedInCache: List[Repository], 
+                  contributors_L: List[List[Contributor]]): Unit
 }
 
 case class RestServerCacheLive(redisServerClient: RedisServerClient) extends RestServerCache {
   def retrieveContributorsFromCache(org:Organization, repo: Repository): List[Contributor] = {
     val repoK = buildRepoK(org, repo)
-    val res = redisServerClient.redisClient.lrange(repoK, 1, redisServerClient.redisClient.llen(repoK).toInt - 1).
-      asScala.toList
+    val res = redisServerClient.redisClient.
+              lrange(repoK, 1, redisServerClient.redisClient.llen(repoK).toInt - 1).asScala.toList
     logger.info(s"repo '$repoK' retrieved from cache, # of contributors=${res.length}")
     res.map(s => stringToContrib(repo, s))
   }
