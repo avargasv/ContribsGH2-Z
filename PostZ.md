@@ -655,9 +655,12 @@ of the ZIO modular structure over the original one.
 
 ## 5. Characteristics of the ZIO implementation in terms of efficiency
 
-To make a simple comparison of the sequential and parallel versions of our ZIO REST server, the first one implemented 
-using `ZIO.collectAll` and the second using instead `ZIO.collectAllPar` to sequence the calls to the REST GitHub API,  
-we executed both versions for the organization "revelation", already mentioned in previous posts of this series.
+To make a simple comparison of the sequential and parallel versions of our ZIO REST server, the former implemented 
+using `ZIO.collectAll` and the later using instead `ZIO.collectAllPar` as explained before, we executed both for the 
+organization "revelation".
+
+N.B. If you receive a 500 Htpp response (internal server error) when executing the application on Windows, probably
+the Windows Defender Firewall is blocking the Redis server. Try again and the problem will go away.
 
 The following lines show part of a trace of the executions, displayed by the programs to the logger console.
 
@@ -708,7 +711,7 @@ The following lines show part of a trace of the executions, displayed by the pro
 ----------------------------------------------------------------------------------------------------------------
 
 As we can see, the parallel version took about a quarter of the time of the sequential one. The times shown are for 
-a laptop with 4 Intel I7 cores. The organization used for the comparison, "revelation", has 24 repositories.
+a laptop with 4 Intel I7 cores.
 
 The trace of a second call to our service using the parallel version with the same parameters and organization, shows:
 
@@ -825,8 +828,6 @@ separation between the definition of an effectful program and the execution of i
 
 Finally, some links to great resources available for learning ZIO:
 - Courses, [Rock The JVM](https://rockthejvm.com/p/zio), [Developer Inside You](https://www.youtube.com/playlist?list=PLJGDHERh23x-_ammk-n2XuZWhoRVB-wAF). 
-- Articles, ebooks and presentations, [Scalac](https://scalac.io/resources/), where we made our first contact with ZIO, 
-thanks to Jorge Vásquez.
+- Articles, ebooks and presentations, [Scalac](https://scalac.io/resources/).
 - ZIO's [official site](https://zio.dev/reources), with many useful guides and good reference material. 
-- The "bible" [Zionomicon](https://www.zionomicon.com/), whose main author is John A. De Goes, the creator 
-of ZIO.
+- The "bible" [Zionomicon](https://www.zionomicon.com/), whose main author is John A. De Goes, the creator of ZIO.
