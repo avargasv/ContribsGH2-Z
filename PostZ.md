@@ -771,10 +771,10 @@ most cases.
 
 - **Higher level tools for concurrency.** ZIO provides synchronization primitives and concurrent data structures 
 that greatly simplify the development of concurrent applications, such as:
-- `Ref` to safely share mutable state between fibers, 
-- `Semaphore` to control the degree of concurrency of fibers, 
-- `Queue` to distribute work among multiple fibers, and many others.
-- Besides, ZIO provides `STM` (Software Transactional Memory) that allows performing a group of memory operations as 
+  - `Ref` to safely share mutable state between fibers, 
+  - `Semaphore` to control the degree of concurrency of fibers, 
+  - `Queue` to distribute work among multiple fibers, and many others.
+  - Besides, ZIO provides `STM` (Software Transactional Memory) that allows performing a group of memory operations as 
 a single atomic operation. STM guarantees three of the well-known ACID properties of database transactions: 
 atomicity(A), consistency(C) and isolation(I) (not durability(D), that doesn't make sense for memory operations).
 
