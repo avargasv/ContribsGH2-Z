@@ -659,8 +659,9 @@ To make a simple comparison of the sequential and parallel versions of our ZIO R
 using `ZIO.collectAll` and the later using instead `ZIO.collectAllPar` as explained before, we executed both for the 
 organization "revelation".
 
-*Please note, if you try these examples on Windows and receive a 500 HTTP response, probably the Defender Firewall 
-is blocking Redis. Simply starting a new sbt session should solve the problem.*
+*Please note, if you try these examples on Windows and receive a 500 HTTP response (internal server error), probably 
+the Defender Firewall is blocking the embedded Redis server. Simply starting a new sbt session should solve the 
+problem.*
 
 The following lines show part of a trace of the executions, displayed by the programs to the logger console.
 
