@@ -365,9 +365,9 @@ To start with, `contributorsByOrganization` in the Akka case returns directly a 
 ZIO case it returns, quite predictably, a functional effect, whose type,
 `ZIO[zio.http.Client, Throwable, List[Contributor]]`, has a `List[Contributor]` as the result of a ZIO 
 that requires a `zio.http.Client` to be run and can fail with a `Throwable`. This ZIO is composed in the rest 
-of the program with other *functional* effects in the way appropriate to implement our REST service. Those effects 
+of the program with other **functional** effects in the way appropriate to implement our REST service. Those effects 
 are finally executed by the ZIO runtime, at the very edge of our program (the already mentioned "end of the world") 
-which is the only place where *real* effects occur.
+which is the only place where **real** effects occur.
 
 Next, the `orDie` function applied to the return value of `contributorsByOrganization` in the ZIO case, is used to 
 convert it to an "infallible" ZIO (a ZIO with error type `Nothing`). This results, **at runtime**, in the killing of 
@@ -659,8 +659,8 @@ To make a simple comparison of the sequential and parallel versions of our ZIO R
 using `ZIO.collectAll` and the later using instead `ZIO.collectAllPar` as explained before, we executed both for the 
 organization "revelation".
 
-N.B. If you receive a 500 Htpp response (internal server error) when executing the application on Windows, probably
-the Windows Defender Firewall is blocking the Redis server. Try again and the problem will go away.
+*Please note, if you try these examples on Windows and receive a 500 HTTP response, probably the Defender Firewall 
+is blocking Redis. Simply starting a new sbt session should solve the problem.*
 
 The following lines show part of a trace of the executions, displayed by the programs to the logger console.
 
