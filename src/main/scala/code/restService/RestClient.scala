@@ -8,6 +8,7 @@ import code.model.Entities._
 
 import java.time.Instant
 
+// RestClient layer
 trait RestClient {
   def reposByOrganization(organization: Organization): ZIO[zio.http.Client, Nothing, List[Repository]]
   def contributorsByRepo(organization: Organization, repo: Repository): ZIO[zio.http.Client, Nothing, List[Contributor]]

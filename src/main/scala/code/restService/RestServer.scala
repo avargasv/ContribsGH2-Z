@@ -10,6 +10,7 @@ import code.model.Entities._
 import java.time.{Duration, Instant}
 import java.util.Date
 
+// RestServer layer
 trait RestServer {
   val runServer: ZIO[Any, Throwable, ExitCode]
 }
@@ -116,6 +117,7 @@ import redis.embedded.RedisServer
 import redis.clients.jedis.Jedis
 import scala.jdk.CollectionConverters._
 
+// RestServerCache layer
 trait RestServerCache {
   def repoUpdatedInCache(org:Organization, repo: Repository): Boolean
   def retrieveContributorsFromCache(org:Organization, repo: Repository): List[Contributor]
@@ -184,6 +186,7 @@ object RestServerCacheLive {
     ZLayer.fromFunction(RestServerCacheLive(_))
 }
 
+// RedisServerClient layer
 trait RedisServerClient {
   val redisServer: RedisServer
   val redisClient: Jedis
@@ -215,10 +218,10 @@ object RedisServerClientLive {
     ZLayer.scoped(RedisServerClientLive)
 }
 
+
+// REST service implementation as a running instance of a ZIO-Http server, with all dependencies provided as ZIO layers
 object ContribsGH2Z extends ZIOAppDefault {
 
-  // REST service implementation as a running instance of a ZIO-Http server, with all dependencies provided as ZIO layers
-  // ("end-of-the-world" execution by the ZIO run-time of a ZIO service defined by composition of effects as values)
   override val run = {
     ZIO.serviceWithZIO[RestServer](_.runServer).
       provide(
