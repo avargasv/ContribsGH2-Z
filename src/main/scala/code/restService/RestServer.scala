@@ -102,7 +102,7 @@ final case class RestServerLive(restClient: RestClient, restServerCache: RestSer
   // ZIO-Http definition of the server for the REST service
   private val port: Int = 8080
   val runServer: ZIO[Any, Throwable, ExitCode] = for {
-    _ <- Console.printLine(s"Starting server on http://localhost:$port")
+    _ <- Console.printLine(s"Starting server on http://0.0.0.0:$port")
     _ <- Server.serve(contribsGH2ZApp).provide(Server.defaultWithPort(port), zio.http.Client.default)
   } yield ExitCode.success
 
@@ -112,112 +112,6 @@ object RestServerLive {
   val layer =
     ZLayer.fromFunction(RestServerLive(_, _))
 }
-
-import redis.embedded.RedisServer
-import redis.clients.jedis.Jedis
-import scala.jdk.CollectionConverters._
-
-// RestServerCache layer
-trait RestServerCache {
-  def repoUpdatedInCache(org:Organization, repo: Repository): Boolean
-  def retrieveContributorsFromCache(org:Organization, repo: Repository): List[Contributor]
-  def updateCache(organization: Organization, reposNotUpdatedInCache: List[Repository], contributors_L: List[List[Contributor]]): Unit
-}
-
-case class RestServerCacheLive(redisServerClient: RedisServerClient) extends RestServerCache {
-
-  private def contribToString(c: Contributor) = c.contributor.trim + ":" + c.contributions
-
-  private def stringToContrib(r: Repository, s: String) = {
-    val v = s.split(":").toVector
-    Contributor(r.name, v(0).trim, v(1).trim.toInt)
-  }
-
-  private def buildRepoK(o: Organization, r: Repository) = o.trim + "-" + r.name
-
-  // return true if the repository was updated in the Redis cache after it was updated on the GitHub server
-  def repoUpdatedInCache(org: Organization, repo: Repository): Boolean = {
-    val repoK = buildRepoK(org, repo)
-    redisServerClient.redisClient.lrange(repoK, 0, 0).asScala.toList match {
-      case s :: _ =>
-        val cachedUpdatedAt = Instant.parse(s.substring(s.indexOf(":") + 1))
-        cachedUpdatedAt.compareTo(repo.updatedAt) >= 0
-      case _ => false
-    }
-  }
-
-  def retrieveContributorsFromCache(org:Organization, repo: Repository): List[Contributor] = {
-    val repoK = buildRepoK(org, repo)
-    val res = redisServerClient.redisClient.lrange(repoK, 1, redisServerClient.redisClient.llen(repoK).toInt - 1).
-      asScala.toList
-    logger.info(s"repo '$repoK' retrieved from cache, # of contributors=${res.length}")
-    res.map(s => stringToContrib(repo, s))
-  }
-
-  private def saveContributorsToCache(org: Organization, repo: Repository, contributors: List[Contributor]) = {
-    val repoK = buildRepoK(org, repo)
-    redisServerClient.redisClient.del(repoK)
-    logger.info(s"repo '$repoK' stored in cache")
-    contributors.foreach { c: Contributor =>
-      redisServerClient.redisClient.lpush(repoK, contribToString(c))
-    }
-    redisServerClient.redisClient.lpush(repoK, s"updatedAt:${repo.updatedAt.toString}")
-  }
-
-  // update cache with non-existent or recently-modified repos
-  def updateCache(organization: Organization, reposNotUpdatedInCache: List[Repository], contributors_L: List[List[Contributor]]): Unit = {
-    contributors_L.foreach { contribs_L =>
-      if (contribs_L.length > 0) {
-        val repoK = organization.trim + "-" + contribs_L.head.repo
-        reposNotUpdatedInCache.find(r => (organization.trim + "-" + r.name) == repoK) match {
-          case Some(repo) =>
-            saveContributorsToCache(organization, repo, contribs_L)
-          case None =>
-            ()
-        }
-      }
-    }
-  }
-
-}
-
-object RestServerCacheLive {
-  val layer =
-    ZLayer.fromFunction(RestServerCacheLive(_))
-}
-
-// RedisServerClient layer
-trait RedisServerClient {
-  val redisServer: RedisServer
-  val redisClient: Jedis
-}
-
-case class RedisServerClientLive() extends RedisServerClient {
-  val redisServer = new RedisServer(6379)
-  try {
-    redisServer.start()
-  } catch {
-    // just use it if already started
-    case _: Throwable => ()
-  }
-  val redisClient = new Jedis()
-}
-
-object RedisServerClientLive {
-  def releaseRSCAux(rsc: RedisServerClientLive): Unit = {
-    rsc.redisClient.flushAll()
-    rsc.redisClient.close()
-    rsc.redisServer.stop()
-    logger.info("Cache cleared and Redis server stopped!")
-  }
-  def acquireRSC: ZIO[Any, Nothing, RedisServerClientLive] = ZIO.succeed(new RedisServerClientLive())
-  def releaseRSC(rsc: RedisServerClientLive): ZIO[Any, Nothing, Unit] = ZIO.succeed(releaseRSCAux(rsc))
-
-  val RedisServerClientLive = ZIO.acquireRelease(acquireRSC)(releaseRSC)
-  val layer =
-    ZLayer.scoped(RedisServerClientLive)
-}
-
 
 // REST service implementation as a running instance of a ZIO-Http server, with all dependencies provided as ZIO layers
 object ContribsGH2Z extends ZIOAppDefault {
