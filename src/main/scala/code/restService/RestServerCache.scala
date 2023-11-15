@@ -1,5 +1,6 @@
 package code.restService
 
+import code.lib.AppAux._
 import zio._
 import java.time.Instant
 import code.model.Entities._
@@ -38,14 +39,14 @@ case class RestServerCacheLive(redisServerClient: RedisServerClient) extends Res
     val repoK = buildRepoK(org, repo)
     val res = redisServerClient.redisClient.lrange(repoK, 1, redisServerClient.redisClient.llen(repoK).toInt - 1).
       asScala.toList
-    //    logger.info(s"repo '$repoK' retrieved from cache, # of contributors=${res.length}")
+    logger.info(s"repo '$repoK' retrieved from cache, # of contributors=${res.length}")
     res.map(s => stringToContrib(repo, s))
   }
 
   private def saveContributorsToCache(org: Organization, repo: Repository, contributors: List[Contributor]) = {
     val repoK = buildRepoK(org, repo)
     redisServerClient.redisClient.del(repoK)
-    //    logger.info(s"repo '$repoK' stored in cache")
+    logger.info(s"repo '$repoK' stored in cache")
     contributors.foreach { c: Contributor =>
       redisServerClient.redisClient.lpush(repoK, contribToString(c))
     }
