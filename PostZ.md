@@ -831,4 +831,4 @@ Finally, some links to great resources available for learning ZIO:
 - Courses, [Rock The JVM](https://rockthejvm.com/p/zio), [Developer Inside You](https://www.youtube.com/playlist?list=PLJGDHERh23x-_ammk-n2XuZWhoRVB-wAF). 
 - Articles, ebooks and presentations, [Scalac](https://scalac.io/resources/).
 - ZIO's [official site](https://zio.dev/reources), with many useful guides and good reference material. 
-- The "bible" [Zionomicon](https://www.zionomicon.com/), whose main author is John A. De Goes, the creator of ZIO.
+- The "bible" [Zionomicon](https://www.zionomicon.com/), co-written by John A. De Goes, the author of ZIO.
