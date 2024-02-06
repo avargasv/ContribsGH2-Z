@@ -24,7 +24,7 @@ final case class RestClientLive() extends RestClient {
       val updated_at_I = for (updated_at_RE(updated_at) <- updated_at_RE.findAllIn(responsePage)) yield updated_at
       full_name_I.zip(updated_at_I).map(p => Repository(p._1, Instant.parse(p._2))).toList
     }
-    resp//.tap(_ => ZIO.succeed(logger.info(s"[${Thread.currentThread().getName}] reposByOrganization($organization)")))
+    resp
   }
 
   def contributorsByRepo(organization: Organization, repo: Repository): ZIO[zio.http.Client, Nothing, List[Contributor]] = {
@@ -37,7 +37,7 @@ final case class RestClientLive() extends RestClient {
       logger.info(s"repo='${repo.name}', # of contributors=${contributors_L.length}")
       contributors_L
     }
-    resp//.tap(_ => ZIO.succeed(logger.info(s"[${Thread.currentThread().getName}] contributorsByRepo($organization, ${repo.name})")))
+    resp
   }
 
   private def processResponseBody[T](url: String) (processPage: BodyString => List[T]): ZIO[zio.http.Client, Nothing, List[T]] = {
@@ -58,9 +58,9 @@ final case class RestClientLive() extends RestClient {
     processResponsePage(List.empty[T], 1)
   }
 
-  private def getResponseBody(url: String): ZIO[zio.http.Client, Throwable, Either[BodyString, ErrorString]] = {
+  private def getResponseBody(url: String): ZIO[zio.http.Client, Throwable, Either[ErrorString, BodyString]] = {
 
-    def responseBody(body: BodyString, status: Status): Either[BodyString, ErrorString] =
+    def responseBody(body: BodyString, status: Status): Either[ErrorString, BodyString] =
       status match {
         case Status.Ok =>
           Right(body)
