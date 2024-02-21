@@ -134,7 +134,7 @@ Functional effects in ZIO are not actual effects, but blueprints or immutable da
 composed in many useful ways before being thrown, at the so-called "end of the world", to an interpreter that actually 
 runs them. As a consequence, effects in ZIO become first-class values, which allows a programmer to write declarative 
 Scala programs with effects, widening the fundamental declarative character of pure functional programming in Scala. 
-The implications of this feature for the readability and ease of maintenance and evolution of effectful programs are 
+The implications of this feature for the readability and ease of maintenance and evolution of effectual programs are 
 enormous, as are the cognitive consequences of separating the definition of an effect from its execution when 
 conceiving, designing, and implementing a solution to a programming problem of an intrinsic asynchronous/concurrent 
 nature. Finally, testing ZIO programs can be quite effective, thanks to the availability, within ZIO Test, of 
@@ -170,11 +170,11 @@ conceived as a function of type `R => Either[E, A]`. This characterization can b
 to understanding ZIO effects, but it is strictly speaking a gross simplification (to start with, ZIO effects are not 
 functions, but models of complex resourceful computations that can be asynchronous or concurrent). 
  
-ZIO allows the construction of functional effects from values and from effectful code in many ways, the 
+ZIO allows the construction of functional effects from values and from effectual code in many ways, the 
 most common being:
 - `succeed`, a smart constructor that allows to use any value of type A to create a successful ZIO effect, 
 - `fail`, another smart constructor which allows to use any value of type E to create a failed ZIO effect,
-- `attempt`, a function that takes as argument any segment of effectful Scala code and returns a 
+- `attempt`, a function that takes as argument any segment of effectual Scala code and returns a 
 `ZIO[Any, Throwable, A]` where A is the type of the value returned by the code segment.
 
 ZIOs can be processed in many ways. In what follows we will present some of the operators that can be used 
@@ -656,8 +656,8 @@ of the ZIO modular structure over the original one.
 ## 5. Characteristics of the ZIO implementation in terms of efficiency
 
 To make a simple comparison of the sequential and parallel versions of our ZIO REST server, the former implemented 
-using `ZIO.collectAll` and the later using instead `ZIO.collectAllPar` as explained before, we executed both for the 
-organization "revelation".
+using `ZIO.collectAll` and the latter using instead `ZIO.collectAllPar` as explained before, we executed both for 
+the organization "revelation".
 
 *Please note, if you try these examples on Windows and receive a 500 HTTP response (internal server error), probably 
 the Defender Firewall is blocking the embedded Redis server. Simply starting a new sbt session should solve the 
@@ -779,7 +779,7 @@ that greatly simplify the development of concurrent applications, such as:
 a single atomic operation. STM guarantees three of the well-known ACID properties of database transactions: 
 atomicity(A), consistency(C) and isolation(I) (not durability(D), that doesn't make sense for memory operations).
 
-- **Streaming capabilities.** ZIO Stream is an effectful and resourceful streaming library that provides the 
+- **Streaming capabilities.** ZIO Stream is an effectual and resourceful streaming library that provides the 
 traditional source, sink and transform kinds of elements as pure functional, fully composable, components. It 
 supports backpressure through a pull-based mechanism and is fully integrated with ZIO.
 
@@ -825,7 +825,7 @@ idiomatic solution? Could that effort be a good test of the maintainability of a
 advantage of the recently announced [refactoring of ZIO-Http](https://www.youtube.com/watch?v=ozHQmklDF2Y) to get 
 an even better ZIO solution? We hope to give a categorical positive answer to all these questions in a future post, 
 but perhaps it would be better first to write a little more about the conceptual and practical advantages of a clear 
-separation between the definition of an effectful program and the execution of its effects.
+separation between the definition of an effectual program and the execution of its effects.
 
 Finally, some links to great resources available for learning ZIO:
 - Courses, [Rock The JVM](https://rockthejvm.com/p/zio), [Developer Inside You](https://www.youtube.com/playlist?list=PLJGDHERh23x-_ammk-n2XuZWhoRVB-wAF). 
